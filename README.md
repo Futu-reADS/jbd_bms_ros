@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # jbd_bms_ros
 ### Battery Management System BMS jbd
 ## Overview
@@ -53,7 +52,3 @@ roslaunch jbd_bms_bringup jbd_bms_status.launch
 ## Official website
 http://www.jiabaida.com/
 
-=======
-# jbd_bms_ros
-ROS package for Jiabaida BMS
->>>>>>> 794fe117ccaeb42a8473f843fffd22f51655806e
