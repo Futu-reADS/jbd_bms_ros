@@ -1,6 +1,7 @@
 <launch>
   <node pkg="jbd_bms_status" exec="jbd_bms_status_node" name="jbd_bms_status_node" output="screen">
-    <param name="port" value="/dev/jbd_bms"/>
+    <!-- param name="port" value="/dev/jbd_bms"/ -->
+    <param name="port" value="/dev/serial/by-id/usb-1a86_USB_Single_Serial_575C024888-if00"/>
     <param name="frame_id" value="jbd_bms" />
     <param name="baudrate" value="9600" />
     <param name="looprate" value="1" />

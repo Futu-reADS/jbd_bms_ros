@@ -196,6 +196,8 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
         jbd_status_.error_info.push_back(error_info[i]);  
       }
     }
+  } else {
+    RCLCPP_WARN(get_logger(), "buffer_read is empty.");
   }
   /////////////****************///////////////
   if(buffer_vol.size()!=0) {   
@@ -204,11 +206,15 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
       cell_[i/2] = (buffer_vol[4+i]<<8|buffer_vol[5+i])/1000.0;
       jbd_status_.cell_voltage.push_back(cell_[i/2]);       
     }   
+  } else {
+    RCLCPP_WARN(get_logger(), "buffer_vol is empty.");
   }
 
   if(jbd_status_.cell_voltage.size()!=0 && jbd_status_.ntc_tem.size()!=0) {
+    RCLCPP_INFO(get_logger(), "Publishing JBD BMS status.");
     jbd_pub_->publish(jbd_status_);
   } else if(!bms_ser_.isOpen()) {
+    RCLCPP_WARN(get_logger(), "Detected zero-size data.");
     jbd_status_.error_id.push_back(13);
     jbd_status_.error_info.push_back(error_info[13]);
     jbd_pub_->publish(jbd_status_);
@@ -234,17 +240,19 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
   jbd_status_.error_info.clear();
 }
 
-std::vector<uint8_t> iqr::JbdBmsStatus::dataRead(uint8_t date_type, uint8_t checksum_write, uint16_t buffer_sum, uint16_t checksum_read, std::vector<uint8_t> buffer) {
+std::vector<uint8_t> iqr::JbdBmsStatus::dataRead(uint8_t date_type, uint8_t checksum_write, uint16_t buffer_sum, uint16_t checksum_read) {
+  std::vector<uint8_t> buffer;
   int index = 0;
   buffer_write_[2] = date_type;
   buffer_write_[5] = checksum_write;
+  findpack = false;    // 20240922HM added
   try{
     bms_ser_.write(buffer_write_,7); 
     //ros::Duration(0.1).sleep();
     rclcpp::sleep_for(100ms);
     if(bms_ser_.available()) {   
       bms_ser_.read(buffer, bms_ser_.available());
-      while(!findpack) {
+      while(!findpack && index < buffer.size()) {
         if(buffer[index]==0xDD) {
           buffer.begin() = buffer.erase(buffer.begin(), buffer.begin()+index);
           checksum_read = buffer[buffer.size()-3]<<8|buffer[buffer.size()-2];
@@ -267,6 +275,11 @@ std::vector<uint8_t> iqr::JbdBmsStatus::dataRead(uint8_t date_type, uint8_t chec
   catch(serial::IOException& e) {
     bms_ser_.close();
     initPort();
+  }
+  if (!findpack) {
+    RCLCPP_WARN(get_logger(), "Checksum error");
+    buffer.clear();
+    RCLCPP_WARN(get_logger(), "buffer cleared.");
   }        
   return buffer;
 }
