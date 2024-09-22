@@ -211,7 +211,7 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
   }
 
   if(jbd_status_.cell_voltage.size()!=0 && jbd_status_.ntc_tem.size()!=0) {
-    RCLCPP_INFO(get_logger(), "Publishing JBD BMS status.");
+    //RCLCPP_INFO(get_logger(), "Publishing JBD BMS status.");
     jbd_pub_->publish(jbd_status_);
   } else if(!bms_ser_.isOpen()) {
     RCLCPP_WARN(get_logger(), "Detected zero-size data.");
