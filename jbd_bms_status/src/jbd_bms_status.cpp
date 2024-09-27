@@ -272,7 +272,7 @@ std::vector<uint8_t> iqr::JbdBmsStatus::dataRead(uint8_t date_type, uint8_t chec
     // send status requenst to bms
     bms_ser_.write(buffer_write_,7); 
     //ros::Duration(0.1).sleep();
-    rclcpp::sleep_for(100ms);
+    rclcpp::sleep_for(300ms);
     // check status response from bms
     if(bms_ser_.available()) {   
       bms_ser_.read(buffer, bms_ser_.available());
