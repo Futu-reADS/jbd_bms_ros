@@ -17,18 +17,13 @@ int main(int argc, char *argv[]) {
   while (rclcpp::ok()) {
     jbd_bms_status.buffer_all_ = jbd_bms_status.dataRead(
         jbd_bms_status.cmd_status_,
-        jbd_bms_status.cmd_status_sum_,
-        buffer_sum,
-        buffer_sum);
+        jbd_bms_status.cmd_status_sum_);
 
     jbd_bms_status.buffer_vol_ = jbd_bms_status.dataRead(
         jbd_bms_status.cmd_voltage_,
-        jbd_bms_status.cmd_voltage_sum_,
-        buffer_sum,
-        buffer_sum);
+        jbd_bms_status.cmd_voltage_sum_);
 
     jbd_bms_status.dataParsing(jbd_bms_status.buffer_all_, jbd_bms_status.buffer_vol_);
-    
     loop_rate.sleep();
   }
 

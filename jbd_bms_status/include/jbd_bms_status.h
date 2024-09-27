@@ -31,8 +31,7 @@ namespace iqr {
     //JbdBmsStatus(ros::NodeHandle& nod);
     JbdBmsStatus(std::string nodename);
     bool initPort();
-    std::vector<uint8_t> dataRead(uint8_t date_type, uint8_t check_sum_write, uint16_t buffer_sum, 
-				  uint16_t check_sum_read); // , std::vector<uint8_t> buffer);
+    std::vector<uint8_t> dataRead(uint8_t date_type, uint8_t check_sum_write); // , std::vector<uint8_t> buffer);
     void dataParsing(std::vector<uint8_t>& all, std::vector<uint8_t>& vol);
 
   private:

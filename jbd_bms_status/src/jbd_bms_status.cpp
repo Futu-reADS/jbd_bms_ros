@@ -138,9 +138,14 @@ bool iqr::JbdBmsStatus::initPort() {
 
 void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vector<uint8_t>& buffer_vol) {
 
+  bool flag_buffer_read_complete = false;
+  bool flag_buffer_vol_complete = false;
+
   //time_now_ = ros::Time::now();
   time_now_ = get_clock()->now();
-  if(buffer_read.size()!=0) {
+
+  if(27 <= buffer_read.size()) {
+    
     voltage_ = (buffer_read[4]<<8|buffer_read[5])/100.0;
     if(((buffer_read[6] & 0b10000000) >> 7) == 1) {
       current_ = ((buffer_read[6]<<8|buffer_read[7])-65535.0)/100.0;
@@ -160,10 +165,15 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
     cell_number_ = buffer_read[25];
     ntc_number_ = buffer_read[26];
     
-    for(int i = 0; i < ntc_number_*2; i+=2) {
-      ntf_data_[i/2] = ((buffer_read[27+i]<<8|buffer_read[28+i])-2731)/10.0;
+    if (27+ntc_number_*2 <= buffer_read.size()) {
+      for(int i = 0; i < ntc_number_*2; i+=2) {
+        ntf_data_[i/2] = ((buffer_read[27+i]<<8|buffer_read[28+i])-2731)/10.0;
+      }
+      flag_buffer_read_complete = true;
+    } else {
+      RCLCPP_WARN(get_logger(), "Incomplete NTC thermistor data in buffer_read.");  
     }
-    
+
     day_production_ = (date_production_int_&0x1f);
     month_production_ = ((date_production_int_>>5)&0x0f);
     year_production_ = (2000+ (date_production_int_>>9));
@@ -197,20 +207,25 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
       }
     }
   } else {
-    RCLCPP_WARN(get_logger(), "buffer_read is empty.");
+    RCLCPP_WARN(get_logger(), "buffer_read is incomplete.");
   }
   /////////////****************///////////////
-  if(buffer_vol.size()!=0) {   
+  if(4 <= buffer_vol.size()) {   
     cell_number_ = buffer_vol[3]/2;
-    for(int i = 0; i < cell_number_*2; i+=2) {
-      cell_[i/2] = (buffer_vol[4+i]<<8|buffer_vol[5+i])/1000.0;
-      jbd_status_.cell_voltage.push_back(cell_[i/2]);       
-    }   
+    if (5+cell_number_*2 <= buffer_vol.size()) {
+      for(int i = 0; i < cell_number_*2; i+=2) {
+        cell_[i/2] = (buffer_vol[4+i]<<8|buffer_vol[5+i])/1000.0;
+        jbd_status_.cell_voltage.push_back(cell_[i/2]);       
+      }
+      flag_buffer_vol_complete = true;
+    } else {
+      RCLCPP_WARN(get_logger(), "Incomplete cell data in buffer_vol.");
+    }
   } else {
-    RCLCPP_WARN(get_logger(), "buffer_vol is empty.");
+    RCLCPP_WARN(get_logger(), "Size of buffer_vol insufficient.");
   }
 
-  if(jbd_status_.cell_voltage.size()!=0 && jbd_status_.ntc_tem.size()!=0) {
+  if(flag_buffer_read_complete && flag_buffer_vol_complete) {
     //RCLCPP_INFO(get_logger(), "Publishing JBD BMS status.");
     jbd_pub_->publish(jbd_status_);
   } else if(!bms_ser_.isOpen()) {
@@ -229,7 +244,6 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
   for(int i=0; i<jbd_status_.error_info.size(); i++) {
     RCLCPP_ERROR(get_logger(), "%s", jbd_status_.error_info[i].c_str());
     //ROS_ERROR("%s", jbd_status_.ErrorInfo[i].c_str());
-    
   }
 
   buffer_vol_.clear();
@@ -240,16 +254,26 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
   jbd_status_.error_info.clear();
 }
 
-std::vector<uint8_t> iqr::JbdBmsStatus::dataRead(uint8_t date_type, uint8_t checksum_write, uint16_t buffer_sum, uint16_t checksum_read) {
+std::vector<uint8_t> iqr::JbdBmsStatus::dataRead(uint8_t date_type, uint8_t checksum_write) {
   std::vector<uint8_t> buffer;
   int index = 0;
+  bool findpack;
+  uint16_t buffer_sum = 0;
+  uint16_t checksum_read = 0;
+
   buffer_write_[2] = date_type;
   buffer_write_[5] = checksum_write;
   findpack = false;    // 20240922HM added
   try{
+    // clean remaining read data
+    if(bms_ser_.available()) {   
+      bms_ser_.read(buffer, bms_ser_.available());
+    }
+    // send status requenst to bms
     bms_ser_.write(buffer_write_,7); 
     //ros::Duration(0.1).sleep();
     rclcpp::sleep_for(100ms);
+    // check status response from bms
     if(bms_ser_.available()) {   
       bms_ser_.read(buffer, bms_ser_.available());
       while(!findpack && index < buffer.size()) {
@@ -283,3 +307,4 @@ std::vector<uint8_t> iqr::JbdBmsStatus::dataRead(uint8_t date_type, uint8_t chec
   }        
   return buffer;
 }
+
