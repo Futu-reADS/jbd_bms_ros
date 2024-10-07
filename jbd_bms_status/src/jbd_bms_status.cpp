@@ -131,7 +131,7 @@ bool iqr::JbdBmsStatus::initPort() {
       RCLCPP_ERROR(get_logger(), "[%s]Unable to open port, wait 5 secs and try again", node_name_.c_str());
       dataParsing(buffer_all_, buffer_vol_);
       loop_openport.sleep();
-    }        
+    }
   }
   return true;
 }
