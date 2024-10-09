@@ -89,7 +89,7 @@ namespace iqr {
 
     void jbdCallback();
 
-    void publishStatusMessages(jbd_bms_msg::msg::JbdStatus status);
+    void publishMessagesInStandardFormat(jbd_bms_msg::msg::JbdStatus status);
 
     void BMSDiagnostic(diagnostic_updater::DiagnosticStatusWrapper& status);
   };

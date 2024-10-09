@@ -255,7 +255,7 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
     // jbd_status_.ErrorInfo.clear();
   }
 
-  publishStatusMessages(jbd_status_);
+  publishMessagesInStandardFormat(jbd_status_);
 
   // update diagnostic data
   //diagnostic_updater_.update();
@@ -274,7 +274,7 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
   jbd_status_.error_info.clear();
 }
 
-void iqr::JbdBmsStatus::publishStatusMessages(jbd_bms_msg::msg::JbdStatus current_status) {
+void iqr::JbdBmsStatus::publishMessagesInStandardFormat(jbd_bms_msg::msg::JbdStatus current_status) {
     
     // Publish voltage as Float32
     auto voltage_msg = std_msgs::msg::Float32();
