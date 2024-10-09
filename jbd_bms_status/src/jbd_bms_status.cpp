@@ -286,59 +286,59 @@ void iqr::JbdBmsStatus::publishStatusMessages(jbd_bms_msg::msg::JbdStatus curren
     current_msg.data = current_status.current;
     current_pub_->publish(current_msg);
 
-    // Publish current as Int32
+    // Publish residual_capacity as Int32
     auto residual_capacity_msg = std_msgs::msg::Int32();
     residual_capacity_msg.data = current_status.residual_capacity;
     residual_capacity_pub_->publish(residual_capacity_msg);
 
-    // Publish current as Int32
+    // Publish design_capacity as Int32
     auto design_capacity_msg = std_msgs::msg::Int32();
     design_capacity_msg.data = current_status.design_capacity;
     design_capacity_pub_->publish(design_capacity_msg);
 
-    // Publish current as Int16
+    // Publish cycle_index as Int16
     auto cycle_index_msg = std_msgs::msg::Int16();
     cycle_index_msg.data = current_status.cycle_index;
     cycle_index_pub_->publish(cycle_index_msg);
 
-    // Publish current as String()
+    // Publish date_production as String()
     auto date_production_msg = std_msgs::msg::String();
     date_production_msg.data = current_status.date_production;
     date_production_pub_->publish(date_production_msg);
 
-    // Publish current as UInt32
+    // Publish status_balance as UInt32
     auto status_balance_msg = std_msgs::msg::UInt32();
     status_balance_msg.data = current_status.status_balance;
     status_balance_pub_->publish(status_balance_msg);
 
-    // Publish current as UInt16
+    // Publish status_protect as UInt16
     auto status_protect_msg = std_msgs::msg::UInt16();
     status_protect_msg.data = current_status.status_protect;
     status_protect_pub_->publish(status_protect_msg);
 
-    // Publish current as UInt16
+    // Publish version as UInt16
     auto version_msg = std_msgs::msg::UInt16();
     version_msg.data = current_status.version;
     version_pub_->publish(version_msg);
 
     
 
-    // Publish current as Int16
+    // Publish rsoc as Int16
     auto rsoc_msg = std_msgs::msg::Int16();
     rsoc_msg.data = current_status.rsoc;
     rsoc_pub_->publish(rsoc_msg);
 
-    // Publish current as Int16
+    // Publish status_mos as Int16
     auto status_mos_msg = std_msgs::msg::Int16();
     status_mos_msg.data = current_status.status_mos;
     status_mos_pub_->publish(status_mos_msg);
 
-    // Publish current as Int16
+    // Publish cell_number as Int16
     auto cell_number_msg = std_msgs::msg::Int16();
     cell_number_msg.data = current_status.cell_number;
     cell_number_pub_->publish(cell_number_msg);
 
-    // Publish current as Int16
+    // Publish ntc_number as Int16
     auto ntc_number_msg = std_msgs::msg::Int16();
     ntc_number_msg.data = current_status.ntc_number;
     ntc_number_pub_->publish(ntc_number_msg);
