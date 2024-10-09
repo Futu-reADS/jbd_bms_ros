@@ -32,6 +32,24 @@ iqr::JbdBmsStatus::JbdBmsStatus(std::string nodename) :
   baudrate_ = declare_parameter<int>("baudrate", 9600);
   node_name_ = get_name();
   jbd_pub_ = create_publisher< jbd_bms_msg::msg::JbdStatus >("jbd_bms", 1);
+
+  voltage_pub_ = this->create_publisher<std_msgs::msg::Float32>("voltage", 10);
+  current_pub_ = this->create_publisher<std_msgs::msg::Float32>("current", 10);
+  residual_capacity_pub_ = this->create_publisher<std_msgs::msg::Int32>("residual_capacity", 10);
+  design_capacity_pub_ = this->create_publisher<std_msgs::msg::Int32>("design_capacity", 10);
+  cycle_index_pub_ = this->create_publisher<std_msgs::msg::Int16>("cycle_index", 10);
+  date_production_pub_ = this->create_publisher<std_msgs::msg::String>("date_production", 10);
+  status_balance_pub_ = this->create_publisher<std_msgs::msg::UInt32>("status_balance", 10);
+  status_protect_pub_ = this->create_publisher<std_msgs::msg::UInt16>("status_protect", 10);
+  version_pub_ = this->create_publisher<std_msgs::msg::UInt16>("version", 10);
+  rsoc_pub_ = this->create_publisher<std_msgs::msg::Int16>("rsoc", 10);
+  status_mos_pub_ = this->create_publisher<std_msgs::msg::Int16>("status_mos", 10);
+  cell_number_pub_ = this->create_publisher<std_msgs::msg::Int16>("cell_number", 10);
+  ntc_number_pub_ = this->create_publisher<std_msgs::msg::Int16>("ntc_number", 10);
+  cell_voltage_pub_ = this->create_publisher<std_msgs::msg::Float32MultiArray>("cell_voltage", 10);
+  ntc_temperature_pub_ = this->create_publisher<std_msgs::msg::Float32MultiArray>("ntc_temperature", 10);
+  error_id_pub_ = this->create_publisher<std_msgs::msg::Int64MultiArray>("error_id", 10);
+  error_info_pub_ = this->create_publisher<std_msgs::msg::String>("error_info", 10);
 #else
   // ROS1
   nod.param<std::string>("port", port_, "jbd_bms");
@@ -237,6 +255,8 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
     // jbd_status_.ErrorInfo.clear();
   }
 
+  publishStatusMessages(jbd_status_);
+
   // update diagnostic data
   //diagnostic_updater_.update();
   diagnostic_updater_.force_update();
@@ -252,6 +272,116 @@ void iqr::JbdBmsStatus::dataParsing(std::vector<uint8_t>& buffer_read,std::vecto
   jbd_status_.cell_voltage.clear();
   jbd_status_.error_id.clear();
   jbd_status_.error_info.clear();
+}
+
+void iqr::JbdBmsStatus::publishStatusMessages(jbd_bms_msg::msg::JbdStatus current_status) {
+    
+    // Publish voltage as Float32
+    auto voltage_msg = std_msgs::msg::Float32();
+    voltage_msg.data = jbd_status_.voltage;
+    voltage_pub_->publish(voltage_msg);
+
+    // Publish current as Float32
+    auto current_msg = std_msgs::msg::Float32();
+    current_msg.data = jbd_status_.current;
+    current_pub_->publish(current_msg);
+
+    // Publish current as Int32
+    auto residual_capacity_msg = std_msgs::msg::Int32();
+    residual_capacity_msg.data = jbd_status_.residual_capacity;
+    residual_capacity_pub_->publish(residual_capacity_msg);
+
+    // Publish current as Int32
+    auto design_capacity_msg = std_msgs::msg::Int32();
+    design_capacity_msg.data = jbd_status_.design_capacity;
+    design_capacity_pub_->publish(design_capacity_msg);
+
+    // Publish current as Int16
+    auto cycle_index_msg = std_msgs::msg::Int16();
+    cycle_index_msg.data = jbd_status_.cycle_index;
+    cycle_index_pub_->publish(cycle_index_msg);
+
+    // Publish current as String()
+    auto date_production_msg = std_msgs::msg::String();
+    date_production_msg.data = jbd_status_.date_production;
+    date_production_pub_->publish(date_production_msg);
+
+    // Publish current as UInt32
+    auto status_balance_msg = std_msgs::msg::UInt32();
+    status_balance_msg.data = jbd_status_.status_balance;
+    status_balance_pub_->publish(status_balance_msg);
+
+    // Publish current as UInt16
+    auto status_protect_msg = std_msgs::msg::UInt16();
+    status_protect_msg.data = jbd_status_.status_protect;
+    status_protect_pub_->publish(status_protect_msg);
+
+    // Publish current as UInt16
+    auto version_msg = std_msgs::msg::UInt16();
+    version_msg.data = jbd_status_.version;
+    version_pub_->publish(version_msg);
+
+    
+
+    // Publish current as Int16
+    auto rsoc_msg = std_msgs::msg::Int16();
+    rsoc_msg.data = jbd_status_.rsoc;
+    rsoc_pub_->publish(rsoc_msg);
+
+    // Publish current as Int16
+    auto status_mos_msg = std_msgs::msg::Int16();
+    status_mos_msg.data = jbd_status_.status_mos;
+    status_mos_pub_->publish(status_mos_msg);
+
+    // Publish current as Int16
+    auto cell_number_msg = std_msgs::msg::Int16();
+    cell_number_msg.data = jbd_status_.cell_number;
+    cell_number_pub_->publish(cell_number_msg);
+
+    // Publish current as Int16
+    auto ntc_number_msg = std_msgs::msg::Int16();
+    ntc_number_msg.data = jbd_status_.ntc_number;
+    ntc_number_pub_->publish(ntc_number_msg);
+
+    // Publish cell voltages as Float32MultiArray
+    auto cell_voltages_msg = std_msgs::msg::Float32MultiArray();
+    for (const auto& voltage : jbd_status_.cell_voltage) {
+        cell_voltages_msg.data.push_back(voltage);
+    }
+    cell_voltage_pub_->publish(cell_voltages_msg);
+
+    // Publish NTC temperatures as Float32MultiArray
+    auto ntc_tem_msg = std_msgs::msg::Float32MultiArray();
+    for (const auto& temperature : jbd_status_.ntc_tem) {
+        ntc_tem_msg.data.push_back(temperature);
+    }
+    ntc_temperature_pub_->publish(ntc_tem_msg);
+
+    // Publish status/error codes as Int64MultiArray
+    auto error_ids_msg = std_msgs::msg::Int64MultiArray();
+    auto error_info_msg = std_msgs::msg::String(); // For the concatenated error info
+
+    for (size_t i = 0; i < jbd_status_.error_id.size(); ++i) {
+        error_ids_msg.data.push_back(jbd_status_.error_id[i]);
+        
+        // Add corresponding error info if available
+        if (i < jbd_status_.error_info.size()) {
+            // Concatenate error info, separated by a delimiter (e.g., comma)
+            if (i > 0) {
+                error_info_msg.data += ", "; // Add a comma if not the first error info
+            }
+            error_info_msg.data += jbd_status_.error_info[i];
+        }
+    }
+
+    // Publish the error IDs
+    error_id_pub_->publish(error_ids_msg);
+
+    // Publish the concatenated error info message
+    if (!error_info_msg.data.empty()) {
+        error_info_pub_->publish(error_info_msg);
+    }
+
 }
 
 std::vector<uint8_t> iqr::JbdBmsStatus::dataRead(uint8_t date_type, uint8_t checksum_write) {
