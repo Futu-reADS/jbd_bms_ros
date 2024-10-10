@@ -7,5 +7,22 @@
     <param name="looprate" value="1" />
     <param name="log_level" value="WARN" />
     <remap from="/jbd_bms_status/jbd_bms" to="/bms"/>
+    <remap from="/jbd_bms_status/voltage" to="/ui/battery/voltage"/>
+    <remap from="/jbd_bms_status/current" to="/ui/battery/current"/>
+    <remap from="/jbd_bms_status/residual_capacity" to="/ui/battery/residual_capacity"/>
+    <remap from="/jbd_bms_status/design_capacity" to="/ui/battery/design_capacity"/>
+    <remap from="/jbd_bms_status/cycle_index" to="/ui/battery/cycle_index"/>
+    <remap from="/jbd_bms_status/date_production" to="/ui/battery/date_production"/>
+    <remap from="/jbd_bms_status/status_balance" to="/ui/battery/status_balance"/>
+    <remap from="/jbd_bms_status/status_protect" to="/ui/battery/status_protect"/>
+    <remap from="/jbd_bms_status/version" to="/ui/battery/version"/>
+    <remap from="/jbd_bms_status/rsoc" to="/ui/battery/rsoc"/>
+    <remap from="/jbd_bms_status/status_mos" to="/ui/battery/status_mos"/>
+    <remap from="/jbd_bms_status/cell_number" to="/ui/battery/cell_number"/>
+    <remap from="/jbd_bms_status/ntc_number" to="/ui/battery/ntc_number"/>
+    <remap from="/jbd_bms_status/cell_voltage" to="/ui/battery/cell_voltage"/>
+    <remap from="/jbd_bms_status/ntc_temperature" to="/ui/battery/ntc_temperature"/>
+    <remap from="/jbd_bms_status/error_id" to="/ui/battery/error_id"/>
+    <remap from="/jbd_bms_status/error_info" to="/ui/battery/error_info"/>
   </node>
 </launch>
