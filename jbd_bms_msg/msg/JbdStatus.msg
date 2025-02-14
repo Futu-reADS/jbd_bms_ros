@@ -1,52 +1,52 @@
-Header header
+std_msgs/Header header
 
 # voltage
-float32 Voltage
+float32 voltage
 
 # current
-float32 Current
+float32 current
 
 # residualCapacity
-int32 ResidualCapacity
+int32 residual_capacity
 
 # DesignCapacity
-int32 DesignCapacity
+int32 design_capacity
 
 # CycleIndex
-int16 CycleIndex
+int16 cycle_index
 
-# DataProduction
-string DataProduction
+# DateProduction
+string date_production
 
 # StatusBalance
-uint32 StatusBalance
+uint32 status_balance
 
 # StatusProtect
-uint16 StatusProtect
+uint16 status_protect
 
 # Version
-uint16 Version
+uint16 version
 
 # Rsoc
-int16 Rsoc
+int16 rsoc
 
-# StatueMos
-int16 StatueMos
+# StatusMos
+int16 status_mos
 
 # CellNumber
-int16 CellNumber
+int16 cell_number
 
 # NtcNumber
-int16 NtcNumber
+int16 ntc_number
 
 # NtcTem
-float64[] NtcTem
+float64[] ntc_tem
 
 # CellVoltage
-float64[] CellVoltage
+float64[] cell_voltage
 
 # ErrorId
-int64[] ErrorId
+int64[] error_id
 
 # ErrorInfo
-string[] ErrorInfo
+string[] error_info
